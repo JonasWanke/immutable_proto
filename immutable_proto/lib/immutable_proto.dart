@@ -1,8 +1,11 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
 library immutable_proto;
 
-export 'src/immutable_proto_base.dart';
+import 'package:meta/meta.dart';
 
-// TODO: Export any libraries intended for clients of this package.
+export 'package:meta/meta.dart' show immutable, required;
+
+
+@immutable
+class ImmutableProto {
+  const ImmutableProto();
+}
