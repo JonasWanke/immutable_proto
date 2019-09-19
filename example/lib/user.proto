@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package wanke.immutable_proto.example;
+
+
+message User {
+  // The first name of the user.
+  string first_name = 1;
+
+  // Required. The last name of the user.
+  string last_name = 2;
+
+  // Email addresses of the user.
+  repeated string email_addresses = 3;
+
+  enum FavoriteDrink {
+    UNKNOWN = 0;
+    COFFEE = 1;
+    COKE = 2;
+    TEA = 3;
+  }
+  // The user's favorite drink.
+  FavoriteDrink favorite_drink = 4;
+}
