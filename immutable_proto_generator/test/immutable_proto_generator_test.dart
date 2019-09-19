@@ -1,4 +1,4 @@
-import 'package:immutable_proto/immutable_proto.dart';
+import 'package:immutable_proto_generator/immutable_proto_generator.dart';
 import 'package:test/test.dart';
 
 void main() {
