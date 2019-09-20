@@ -9,4 +9,5 @@ environment:
 
 dependencies:
   protobuf: ^0.13.15
+  kt_dart: ^0.6.2
   meta: ^1.1.7
