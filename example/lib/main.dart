@@ -15,5 +15,7 @@ class MutableUser {
   @required
   String lastName;
 
-  UserFavoriteDrink favoriteDrink;
+  KtList<String> emailAddresses;
+
+  List<proto.User_FavoriteDrink> favoriteDrinks;
 }

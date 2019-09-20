@@ -11,7 +11,7 @@ const User$json = const {
     const {'1': 'first_name', '3': 1, '4': 1, '5': 9, '10': 'firstName'},
     const {'1': 'last_name', '3': 2, '4': 1, '5': 9, '10': 'lastName'},
     const {'1': 'email_addresses', '3': 3, '4': 3, '5': 9, '10': 'emailAddresses'},
-    const {'1': 'favorite_drink', '3': 4, '4': 1, '5': 14, '6': '.wanke.immutable_proto.example.User.FavoriteDrink', '10': 'favoriteDrink'},
+    const {'1': 'favorite_drinks', '3': 4, '4': 3, '5': 14, '6': '.wanke.immutable_proto.example.User.FavoriteDrink', '10': 'favoriteDrinks'},
   ],
   '4': const [User_FavoriteDrink$json],
 };

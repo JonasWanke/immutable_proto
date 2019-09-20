@@ -18,7 +18,7 @@ class User extends $pb.GeneratedMessage {
     ..aOS(1, 'firstName')
     ..aOS(2, 'lastName')
     ..pPS(3, 'emailAddresses')
-    ..e<User_FavoriteDrink>(4, 'favoriteDrink', $pb.PbFieldType.OE, User_FavoriteDrink.UNKNOWN, User_FavoriteDrink.valueOf, User_FavoriteDrink.values)
+    ..pc<User_FavoriteDrink>(4, 'favoriteDrinks', $pb.PbFieldType.PE, null, User_FavoriteDrink.valueOf, User_FavoriteDrink.values)
     ..hasRequiredFields = false
   ;
 
@@ -48,9 +48,6 @@ class User extends $pb.GeneratedMessage {
 
   $core.List<$core.String> get emailAddresses => $_getList(2);
 
-  User_FavoriteDrink get favoriteDrink => $_getN(3);
-  set favoriteDrink(User_FavoriteDrink v) { setField(4, v); }
-  $core.bool hasFavoriteDrink() => $_has(3);
-  void clearFavoriteDrink() => clearField(4);
+  $core.List<User_FavoriteDrink> get favoriteDrinks => $_getList(3);
 }
 

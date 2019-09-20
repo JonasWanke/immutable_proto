@@ -19,6 +19,6 @@ message User {
     COKE = 2;
     TEA = 3;
   }
-  // The user's favorite drink.
-  FavoriteDrink favorite_drink = 4;
+  // The user's favorite drinks.
+  repeated FavoriteDrink favorite_drinks = 4;
 }

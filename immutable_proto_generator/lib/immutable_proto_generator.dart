@@ -98,12 +98,12 @@ class ImmutableProtoGenerator extends Generator {
       postfix: ')\'',
     );
 
-    final enums = fields.filter((f) => f.isEnum).joinToString(
-          transform: (f) => f.generateEnum(),
-          separator: '\n\n',
-        );
-    final enumMappers = fields.filter((f) => f.isEnum).joinToString(
-        transform: (f) => f.generateEnumMappers(), separator: '\n\n');
+    final enums = fields
+        .mapNotNull((f) => f.generateEnum())
+        .joinToString(separator: '\n\n');
+    final enumMappers = fields
+        .mapNotNull((f) => f.generateEnumMappers())
+        .joinToString(separator: '\n\n');
 
     return '''
 @immutable
@@ -149,6 +149,10 @@ $enums
 }
 
 class _ProtoField {
+  static const TYPE_LIST = 'KtList';
+  static const KNOWN_LIST_TYPES = ['List', TYPE_LIST, 'KtMutableList'];
+  static const TYPE_PB_ENUM = 'ProtobufEnum';
+
   _ProtoField(this.typeSystem, this.protoType, this.field, this.protoField)
       : assert(typeSystem != null),
         assert(protoType != null),
@@ -174,12 +178,18 @@ class _ProtoField {
 
   final FieldElement field;
   String get type {
-    if (isEnum) return enumName;
-    return field.type.name;
+    if (isList) {
+      if (isEnum) return '$TYPE_LIST<$enumName>';
+      return '$TYPE_LIST<${(field.type as InterfaceType).typeArguments[0]}>';
+    } else {
+      if (isEnum) return enumName;
+      return field.type.name;
+    }
   }
 
   String get name => field.name;
 
+  bool get isList => KNOWN_LIST_TYPES.contains(field.type.name);
   bool get isRequired => field.hasRequired || isList;
 
   String generateField() =>
@@ -190,39 +200,60 @@ class _ProtoField {
       isRequired ? 'assert($name != null)' : null;
 
   String generateFromProtoArg(String protoName) {
+    final short = name[0];
     var res = '$protoName.$name';
-    if (isEnum) res = '$enumFromProtoName($res)';
+    if (isList) {
+      res = 'KtList.from($protoName.$name)';
+      if (isEnum) res = '$res.map(($short) => $enumFromProtoName($short))';
+    } else if (isEnum) res = '$enumFromProtoName($res)';
     return '$name: $res';
   }
 
   String generateToProtoLine(String protoName) {
+    final short = name[0];
     var res = '$name';
-    if (isEnum) res = '$enumToProtoName($res)';
-    res = '$protoName.$name = $res;';
+    if (isList) {
+      if (isEnum) res = '$res.map(($short) => $enumToProtoName($short))';
+      res = '$protoName.$name.addAll($res.iter);';
+    } else {
+      if (isEnum) res = '$enumToProtoName($res)';
+      res = '$protoName.$name = $res;';
+    }
     return (isRequired ? '' : 'if ($name != null) ') + res;
   }
 
   String generateEquals(String otherName) => '$name == $otherName.$name';
   String generateCopyParam() => '$name: $name ?? this.$name,';
 
-  bool get isEnum =>
-      (protoField.type as InterfaceType).superclass.name == 'ProtobufEnum';
+  bool get isEnum => enumProtoClass != null;
+
+  ClassElement get enumProtoClass {
+    final type = isList
+        ? (field.type as InterfaceType).typeArguments[0]
+        : protoField.type;
+    assert(type is InterfaceType, 'Unknown type of field $field: $type');
+    if ((type as InterfaceType).superclass.name != TYPE_PB_ENUM) return null;
+    return type.element as ClassElement;
+  }
+
   String get enumName {
-    assert(isEnum);
-    return protoField.type.name.replaceAll('_', '');
+    final clazz = enumProtoClass;
+    if (clazz == null) return null;
+    return snakeCamelToUpperCamel(clazz?.name);
   }
 
   String get enumFromProtoName => '${lowerFirstChar(enumName)}FromProto';
   String get enumToProtoName => '${lowerFirstChar(enumName)}ToProto';
 
   KtList<String> enumValuesProto() {
-    return KtList.from((protoField.type.element as ClassElement).fields)
-        .filter((f) => f.type == protoField.type)
+    print('enumValuesProto: $enumProtoClass');
+    return KtList.from(enumProtoClass.fields)
+        .filter((f) => f.type == enumProtoClass.type)
         .map((f) => f.name);
   }
 
   String generateEnum() {
-    assert(isEnum);
+    if (!isEnum) return null;
 
     final values = enumValuesProto().joinToString(
       transform: (v) => '${snakeToLowerCamel(v)},',
@@ -236,9 +267,9 @@ enum $enumName {
   }
 
   String generateEnumMappers() {
-    assert(isEnum);
+    if (!isEnum) return null;
 
-    final protoName = protoField.type.name;
+    final protoName = enumProtoClass.name;
     final argName = lowerFirstChar(enumName);
 
     final protoValues = enumValuesProto();
