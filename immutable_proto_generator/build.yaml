@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      immutable_proto_generator|immutable_proto:
+        enabled: true
+
+builders:
+  immutable_proto:
+    target: ":immutable_proto_generator"
+    import: "package:immutable_proto_generator/immutable_proto_generator.dart"
+    builder_factories: ["generateImmutableProto"]
+    build_extensions: {".dart": [".immutable_proto.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

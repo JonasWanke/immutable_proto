@@ -8,7 +8,12 @@ main() {
   final user = MutableUser()..firstName = 'a';
 }
 
-@ImmutableProto()
+@ImmutableProto(proto.User)
 class MutableUser {
   String firstName;
+
+  @required
+  String lastName;
+
+  UserFavoriteDrink favoriteDrink;
 }
