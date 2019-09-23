@@ -5,7 +5,7 @@ import 'package:immutable_proto/immutable_proto.dart';
 import 'package:immutable_proto_generator/src/utils.dart';
 import 'package:kt_dart/collection.dart';
 
-import 'enum_generator.dart';
+import 'proto_enum.dart';
 
 @immutable
 class ProtoField {
@@ -27,15 +27,24 @@ class ProtoField {
     FieldElement field,
     KtList<ProtoEnum> knownEnums,
   ) async {
-    if (isTypeList(field.type) && field.type.name != TYPE_LIST)
-      throw 'Only $TYPE_LIST should be used as a list type but '
-          '${field.enclosingElement.name}.{field.name} has type ${field.type}';
     return ProtoField._(
       await field.session.typeSystem,
       protoMessage,
       field,
       protoFieldFor(protoMessage, field),
     );
+  }
+
+  static Future<KtList<ProtoField>> fieldsForMessage(
+    ClassElement protoMessage,
+    KtList<ProtoEnum> knownEnums,
+  ) async {
+    return Future.wait(protoMessage.fields
+            .where((f) => !f.isStatic)
+            .where((f) => f.name != 'info_')
+            .where((f) => !protoMessage.supertype.element.fields.contains(f))
+            .map((f) => ProtoField.create(protoMessage, f, knownEnums)))
+        .then((f) => KtList.from(f));
   }
 
   static FieldElement protoFieldFor(

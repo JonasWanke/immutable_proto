@@ -13,7 +13,10 @@ class ProtoEnum {
 
   static KtList<ProtoEnum> enumsForClass(ClassElement clazz) {
     assert(clazz != null);
-    return KtList.from(clazz.library.topLevelElements)
+    return KtList.from(clazz.library.exports)
+        .map((e) => e.exportedLibrary)
+        .plusElement(clazz.library)
+        .flatMap((l) => KtList.from(l.topLevelElements))
         .mapNotNull((e) => e is ClassElement ? e : null)
         .filter((e) => e.name.startsWith(clazz.name) && isTypeEnum(e.type))
         .map((e) => ProtoEnum(e));

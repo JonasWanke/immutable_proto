@@ -1,6 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/dart/element/visitor.dart';
 
 String lowerFirstChar(String original) {
   assert(original != null);
@@ -21,18 +19,6 @@ String snakeToLowerCamel(String original) {
 String snakeCamelToUpperCamel(String original) {
   assert(original != null);
   return original.split('_').map((p) => upperFirstChar(p)).join('');
-}
-
-class FieldGetterVisitor extends SimpleElementVisitor {
-  FieldGetterVisitor(this.fieldName) : assert(fieldName != null);
-
-  final String fieldName;
-  FieldElement field;
-
-  @override
-  visitFieldElement(FieldElement element) {
-    if (element.name == fieldName) field = element;
-  }
 }
 
 const KNOWN_LIST_TYPES = ['List', 'KtList', 'KtMutableList'];
