@@ -10,6 +10,8 @@ import 'package:immutable_proto_generator/src/utils.dart';
 import 'package:kt_dart/collection.dart';
 import 'package:source_gen/source_gen.dart';
 
+import 'src/enum_generator.dart';
+
 Builder generateImmutableProto(BuilderOptions options) =>
     SharedPartBuilder([ImmutableProtoGenerator()], 'immutable_proto');
 
@@ -27,28 +29,29 @@ class ImmutableProtoGenerator extends Generator {
           annotatedElement.element, annotatedElement.annotation, buildStep));
     }
 
-    return values.joinToString(separator: '\n\n');
+    return values.filterNotNull().joinToString(separator: '\n\n');
   }
 
   Future<String> generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) async {
-    assert(element is ClassElement,
-        'Only classes can be annotated with `@ImmutableProto()`.');
-    assert(
-        element.name.startsWith(MUTABLE_PREFIX),
-        'The names of classes annotated with `@ImmutableProto()` should start '
-        'with `$MUTABLE_PREFIX`, for example `${MUTABLE_PREFIX}User`. The '
-        'immutable class will then get automatically generated for you by '
-        'running `pub run build_runner build` (or '
-        '`flutter pub run build_runner build` if you\'re on Flutter).');
+    if (element is! ClassElement)
+      throw 'Only classes can be annotated with `@ImmutableProto()`.';
+    if (!element.name.startsWith(MUTABLE_PREFIX))
+      throw 'The names of classes annotated with `@ImmutableProto()` should '
+          'start with `$MUTABLE_PREFIX`, for example `${MUTABLE_PREFIX}User`. '
+          'The immutable class will then get automatically generated for you '
+          'by running `pub run build_runner build` (or '
+          '`flutter pub run build_runner build` if you\'re on Flutter).';
 
-    final e = element as ClassElement;
-    final name = e.name.substring(MUTABLE_PREFIX.length);
+    final annotatedElement = element as ClassElement;
+    final name = annotatedElement.name.substring(MUTABLE_PREFIX.length);
     final lowerName = lowerFirstChar(name);
-    final type = annotation.read('type').typeValue;
+    final e = annotation.read('type').typeValue.element as ClassElement;
+    final enums = ProtoEnum.enumsForClass(e);
+
     final fields = KtList.from(
       await Future.wait(
-        e.fields.map((f) => ProtoField.create(type, f)),
+        annotatedElement.fields.map((f) => ProtoField.create(e, f, enums)),
       ),
     );
 
@@ -97,17 +100,19 @@ class ImmutableProtoGenerator extends Generator {
       postfix: ')\'',
     );
 
-    final enums = fields
-        .mapNotNull((f) => f.generateEnum())
-        .joinToString(separator: '\n\n');
-    final enumMappers = fields
-        .mapNotNull((f) => f.generateEnumMappers())
-        .joinToString(separator: '\n\n');
+    final enumDefinitions = enums.joinToString(
+      transform: (e) => e.generateEnum(),
+      separator: '\n\n',
+    );
+    final enumMappers = enums.joinToString(
+      transform: (e) => e.generateMappers(),
+      separator: '\n\n',
+    );
 
     return '''
 /*
 @immutable
-class $name${e.supertype != null ? ' extends ' + e.supertype.toString() : ''} {
+class $name${annotatedElement.supertype != null ? ' extends ' + annotatedElement.supertype.toString() : ''} {
   $classFields
 
   $name({
@@ -139,11 +144,10 @@ class $name${e.supertype != null ? ' extends ' + e.supertype.toString() : ''} {
     return $toString;
   }
 
-
   $enumMappers
 }
 
-$enums
+$enumDefinitions
 */
 ''';
   }

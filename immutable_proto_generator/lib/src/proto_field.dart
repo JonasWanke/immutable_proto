@@ -1,51 +1,74 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_system.dart';
+import 'package:immutable_proto/immutable_proto.dart';
 import 'package:immutable_proto_generator/src/utils.dart';
 import 'package:kt_dart/collection.dart';
 
+import 'enum_generator.dart';
+
+@immutable
 class ProtoField {
   static const TYPE_LIST = 'KtList';
-  static const KNOWN_LIST_TYPES = ['List', TYPE_LIST, 'KtMutableList'];
-  static const TYPE_PB_ENUM = 'ProtobufEnum';
 
-  ProtoField(this.typeSystem, this.protoType, this.field, this.protoField)
-      : assert(typeSystem != null),
-        assert(protoType != null),
+  const ProtoField._(
+    this.typeSystem,
+    this.protoMessage,
+    this.field,
+    this.protoField, [
+    this.protoEnum,
+  ])  : assert(typeSystem != null),
+        assert(protoMessage != null),
         assert(field != null),
         assert(protoField != null);
 
   static Future<ProtoField> create(
-      DartType protoType, FieldElement field) async {
-    final visitor = FieldGetterVisitor(field.name);
-    protoType.element.visitChildren(visitor);
-
-    return ProtoField(
+    ClassElement protoMessage,
+    FieldElement field,
+    KtList<ProtoEnum> knownEnums,
+  ) async {
+    if (isTypeList(field.type) && field.type.name != TYPE_LIST)
+      throw 'Only $TYPE_LIST should be used as a list type but '
+          '${field.enclosingElement.name}.{field.name} has type ${field.type}';
+    return ProtoField._(
       await field.session.typeSystem,
-      protoType,
+      protoMessage,
       field,
-      visitor.field,
+      protoFieldFor(protoMessage, field),
     );
   }
 
+  static FieldElement protoFieldFor(
+    ClassElement protoMessage,
+    FieldElement field,
+  ) {
+    return protoMessage.fields.firstWhere((f) => f.name == field.name);
+  }
+
   final TypeSystem typeSystem;
-  final DartType protoType;
+  final ClassElement protoMessage;
   final FieldElement protoField;
+  final ProtoEnum protoEnum;
 
   final FieldElement field;
-  String get type {
-    if (isList) {
-      if (isEnum) return '$TYPE_LIST<$enumName>';
-      return '$TYPE_LIST<${(field.type as InterfaceType).typeArguments[0]}>';
-    } else {
-      if (isEnum) return enumName;
-      return field.type.name;
-    }
+  String get type => isList ? '$TYPE_LIST<$singleType>' : singleType;
+
+  static InterfaceType singleTypeOf(DartType type) {
+    return (isTypeList(type) ? (type as InterfaceType).typeArguments[0] : type)
+        as InterfaceType;
+  }
+
+  String get singleType {
+    if (isEnum) return protoEnum.name;
+    return isList
+        ? (field.type as InterfaceType).typeArguments[0].name
+        : protoField.type.name;
   }
 
   String get name => field.name;
 
-  bool get isList => KNOWN_LIST_TYPES.contains(field.type.name);
+  bool get isList => isTypeList(field.type);
+  bool get isEnum => protoEnum != null;
   bool get isRequired => field.hasRequired || isList;
 
   String generateField() =>
@@ -60,8 +83,9 @@ class ProtoField {
     var res = '$protoName.$name';
     if (isList) {
       res = 'KtList.from($protoName.$name)';
-      if (isEnum) res = '$res.map(($short) => $enumFromProtoName($short))';
-    } else if (isEnum) res = '$enumFromProtoName($res)';
+      if (isEnum)
+        res = '$res.map(($short) => ${protoEnum.fromProtoMethodName}($short))';
+    } else if (isEnum) res = '${protoEnum.fromProtoMethodName}($res)';
     return '$name: $res';
   }
 
@@ -69,10 +93,11 @@ class ProtoField {
     final short = name[0];
     var res = '$name';
     if (isList) {
-      if (isEnum) res = '$res.map(($short) => $enumToProtoName($short))';
+      if (isEnum)
+        res = '$res.map(($short) => ${protoEnum.toProtoMethodName}($short))';
       res = '$protoName.$name.addAll($res.iter);';
     } else {
-      if (isEnum) res = '$enumToProtoName($res)';
+      if (isEnum) res = '${protoEnum.toProtoMethodName}($res)';
       res = '$protoName.$name = $res;';
     }
     return (isRequired ? '' : 'if ($name != null) ') + res;
@@ -80,84 +105,4 @@ class ProtoField {
 
   String generateEquals(String otherName) => '$name == $otherName.$name';
   String generateCopyParam() => '$name: $name ?? this.$name,';
-
-  bool get isEnum => enumProtoClass != null;
-
-  ClassElement get enumProtoClass {
-    final type = isList
-        ? (field.type as InterfaceType).typeArguments[0]
-        : protoField.type;
-    assert(type is InterfaceType, 'Unknown type of field $field: $type');
-    if ((type as InterfaceType).superclass.name != TYPE_PB_ENUM) return null;
-    return type.element as ClassElement;
-  }
-
-  String get enumName {
-    final clazz = enumProtoClass;
-    if (clazz == null) return null;
-    return snakeCamelToUpperCamel(clazz?.name);
-  }
-
-  String get enumFromProtoName => '${lowerFirstChar(enumName)}FromProto';
-  String get enumToProtoName => '${lowerFirstChar(enumName)}ToProto';
-
-  KtList<String> enumValuesProto() {
-    print('enumValuesProto: $enumProtoClass');
-    return KtList.from(enumProtoClass.fields)
-        .filter((f) => f.type == enumProtoClass.type)
-        .map((f) => f.name);
-  }
-
-  String generateEnum() {
-    if (!isEnum) return null;
-
-    final values = enumValuesProto().joinToString(
-      transform: (v) => '${snakeToLowerCamel(v)},',
-      separator: '\n',
-    );
-    return '''
-enum $enumName {
-  $values
-}
-''';
-  }
-
-  String generateEnumMappers() {
-    if (!isEnum) return null;
-
-    final protoName = enumProtoClass.name;
-    final argName = lowerFirstChar(enumName);
-
-    final protoValues = enumValuesProto();
-    final fromCases = protoValues
-        .drop(1)
-        .map((f) => 'case proto.$protoName.$f:'
-            '  return $enumName.${snakeToLowerCamel(f)};')
-        .plusElement('case proto.$protoName.${protoValues.first()}:'
-            'default:'
-            '  return $enumName.${snakeToLowerCamel(protoValues.first())};')
-        .joinToString(separator: '\n');
-    final toCases = protoValues
-        .drop(1)
-        .map((f) => 'case $enumName.${snakeToLowerCamel(f)}:'
-            '  return proto.$protoName.$f;')
-        .plusElement('case $enumName.${snakeToLowerCamel(protoValues.first())}:'
-            'default:'
-            '  return proto.$protoName.${protoValues.first()};')
-        .joinToString(separator: '\n');
-
-    return '''
-static $enumName $enumFromProtoName(proto.$protoName $argName) {
-  switch ($argName) {
-    $fromCases
-  }
-}
-
-static proto.$protoName $enumToProtoName($enumName $argName) {
-  switch ($argName) {
-    $toCases
-  }
-}
-''';
-  }
 }

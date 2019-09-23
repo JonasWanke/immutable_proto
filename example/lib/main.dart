@@ -17,5 +17,5 @@ class MutableUser {
 
   KtList<String> emailAddresses;
 
-  List<proto.User_FavoriteDrink> favoriteDrinks;
+  KtList<proto.User_FavoriteDrink> favoriteDrinks;
 }

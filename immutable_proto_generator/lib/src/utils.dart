@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/visitor.dart';
 
 String lowerFirstChar(String original) {
@@ -32,4 +33,9 @@ class FieldGetterVisitor extends SimpleElementVisitor {
   visitFieldElement(FieldElement element) {
     if (element.name == fieldName) field = element;
   }
+}
+
+const KNOWN_LIST_TYPES = ['List', 'KtList', 'KtMutableList'];
+bool isTypeList(DartType type) {
+  return KNOWN_LIST_TYPES.contains(type.name);
 }
