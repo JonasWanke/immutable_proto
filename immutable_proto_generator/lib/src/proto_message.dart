@@ -13,33 +13,46 @@ class ProtoMessage {
 
   const ProtoMessage._(
     this.protoMessage,
+    this.subMessages,
     this.enums,
-    this.fields, [
+    this.fields, {
     this.annotatedClass,
-  ])  : assert(protoMessage != null),
+  })  : assert(protoMessage != null),
         assert(enums != null),
         assert(fields != null);
 
   static Future<ProtoMessage> create(
-    ClassElement clazz, [
+    ClassElement protoMessageClass, {
     ClassElement annotatedClass,
-  ]) async {
-    final enums = ProtoEnum.enumsForClass(clazz);
+    KtList<ProtoMessage> subMessages,
+  }) async {
+    assert(protoMessageClass != null);
+
+    final enums = ProtoEnum.enumsForClass(protoMessageClass);
+    final subMessages = await _subMessages(protoMessageClass);
     return ProtoMessage._(
-      clazz,
+      protoMessageClass,
+      subMessages,
       enums,
-      await ProtoField.fieldsForMessage(clazz, enums),
-      annotatedClass,
+      await ProtoField.fieldsForMessage(protoMessageClass, subMessages, enums),
+      annotatedClass: annotatedClass,
     );
   }
 
-  static Future<KtList<ProtoMessage>> subMessages(ProtoMessage message) async {
-    assert(message != null);
-    return Future.wait(message.protoMessage.library.topLevelElements
-        .whereType<ClassElement>()
-        .where((e) => e.name.startsWith(message.protoMessage.name))
-        .where((e) => isTypeMessage(e.type))
-        .map((e) => ProtoMessage.create(e))).then((m) => KtList.from(m));
+  static Future<KtList<ProtoMessage>> _subMessages(
+    ClassElement protoMessageClass,
+  ) async {
+    assert(protoMessageClass != null);
+
+    return Future.wait(
+      KtList.from(protoMessageClass.library.topLevelElements)
+          .filterIsInstance<ClassElement>()
+          .filter((e) => e.name.startsWith(protoMessageClass.name))
+          .filter((e) => e != protoMessageClass)
+          .filter((e) => isTypeMessage(e.type))
+          .map((e) => ProtoMessage.create(e))
+          .asList(),
+    ).then((m) => KtList.from(m));
   }
 
   static bool isTypeMessage(InterfaceType type) =>
@@ -50,8 +63,10 @@ class ProtoMessage {
   final KtList<ProtoField> fields;
 
   final ClassElement annotatedClass;
+  final KtList<ProtoMessage> subMessages;
 
   String get name => snakeCamelToUpperCamel(protoMessage.name);
+  String get protoName => protoMessage.name;
 
   String generate() {
     final lowerName = lowerFirstChar(name);
@@ -77,9 +92,10 @@ class ProtoMessage {
       transform: (f) => f.generateCtorArg(),
       separator: '\n',
     );
-    final ctorInitializers = fields
-        .mapNotNull((f) => f.generateCtorInitializer())
-        .joinToString(prefix: ':');
+    final ctorInitializersList =
+        fields.mapNotNull((f) => f.generateCtorInitializer()).joinToString();
+    final ctorInitializers =
+        (ctorInitializersList.isNotEmpty ? ':' : '') + ctorInitializersList;
 
     final fromProtoFields = fields.joinToString(
       transform: (f) => f.generateFromProtoArg(lowerName),
@@ -122,8 +138,13 @@ class ProtoMessage {
       separator: '\n\n',
     );
 
+    final subMessagesCode = subMessages?.joinToString(
+          transform: (m) => m.generate(),
+          separator: '\n\n',
+        ) ??
+        '';
+
     return '''
-/*
 @immutable
 class $name $extendsImplements {
   $classFields
@@ -132,10 +153,10 @@ class $name $extendsImplements {
     $ctorArgs
   }) $ctorInitializers;
 
-  $name.fromProto(proto.$name $lowerName)
+  $name.fromProto(proto.$protoName $lowerName)
     : this($fromProtoFields);
-  proto.$name toProto() {
-    final $lowerName = proto.$name();
+  proto.$protoName toProto() {
+    final $lowerName = proto.$protoName();
     $toProtoFields
     return $lowerName;
   }
@@ -161,7 +182,8 @@ class $name $extendsImplements {
 }
 
 $enumDefinitions
-*/
+
+$subMessagesCode
 ''';
   }
 }

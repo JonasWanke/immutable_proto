@@ -11,14 +11,15 @@ class ProtoEnum {
 
   const ProtoEnum(this.protoClass) : assert(protoClass != null);
 
-  static KtList<ProtoEnum> enumsForClass(ClassElement clazz) {
-    assert(clazz != null);
-    return KtList.from(clazz.library.exports)
+  static KtList<ProtoEnum> enumsForClass(ClassElement protoMessageClass) {
+    assert(protoMessageClass != null);
+    return KtList.from(protoMessageClass.library.exports)
         .map((e) => e.exportedLibrary)
-        .plusElement(clazz.library)
+        .plusElement(protoMessageClass.library)
         .flatMap((l) => KtList.from(l.topLevelElements))
-        .mapNotNull((e) => e is ClassElement ? e : null)
-        .filter((e) => e.name.startsWith(clazz.name) && isTypeEnum(e.type))
+        .filterIsInstance<ClassElement>()
+        .filter((e) => isTypeEnum(e.type))
+        .filter((e) => e.name.startsWith(protoMessageClass.name))
         .map((e) => ProtoEnum(e));
   }
 
