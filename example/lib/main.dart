@@ -5,7 +5,20 @@ import 'proto_generated/user.pb.dart' as proto;
 part 'main.g.dart';
 
 main() {
-  final user = MutableUser()..firstName = 'a';
+  final jane = User(
+    firstName: 'Jane',
+    lastName: 'Doe',
+    emailAddresses: KtList.of('jane.doe@example.com'),
+    favoriteDrink: UserFavoriteDrink.coffee,
+  );
+  print(jane);
+
+  final john = jane.copy(
+    firstName: 'John',
+    emailAddresses: KtList.of('john.doe@example.com'),
+    favoriteDrink: UserFavoriteDrink.tea,
+  );
+  print(john);
 }
 
 @ImmutableProto(proto.User)
@@ -17,5 +30,5 @@ class MutableUser {
 
   KtList<String> emailAddresses;
 
-  KtList<proto.User_FavoriteDrink> favoriteDrinks;
+  proto.User_FavoriteDrink favoriteDrink;
 }

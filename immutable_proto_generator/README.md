@@ -1,11 +1,5 @@
-# immutable_proto_generator
-
-Dart packages for generating immutable classes from Protocol Buffers
-
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][issues].
+See the [`immutable_proto`' README](https://pub.dev/packages/immutable_proto) for how to use this
+package.
 
 
 ## License

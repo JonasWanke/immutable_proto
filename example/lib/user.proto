@@ -10,13 +10,8 @@ message User {
   // Required. The last name of the user.
   string last_name = 2;
 
-  message EmailAddress {
-    string local_part = 1;
-
-    string domain = 2;
-  }
   // Email addresses of the user.
-  repeated EmailAddress email_addresses = 3;
+  repeated string email_addresses = 3;
 
   enum FavoriteDrink {
     UNKNOWN = 0;
@@ -24,6 +19,6 @@ message User {
     COKE = 2;
     TEA = 3;
   }
-  // The user's favorite drinks.
-  repeated FavoriteDrink favorite_drinks = 4;
+  // The user's favorite drink.
+  FavoriteDrink favorite_drink = 4;
 }

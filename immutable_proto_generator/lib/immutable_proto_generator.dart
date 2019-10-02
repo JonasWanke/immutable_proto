@@ -5,13 +5,10 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:immutable_proto/immutable_proto.dart';
-import 'package:immutable_proto_generator/src/proto_field.dart';
-import 'package:immutable_proto_generator/src/proto_message.dart';
-import 'package:immutable_proto_generator/src/utils.dart';
 import 'package:kt_dart/collection.dart';
 import 'package:source_gen/source_gen.dart';
 
-import 'src/proto_enum.dart';
+import 'src/proto_message.dart';
 
 Builder generateImmutableProto(BuilderOptions options) =>
     SharedPartBuilder([ImmutableProtoGenerator()], 'immutable_proto');

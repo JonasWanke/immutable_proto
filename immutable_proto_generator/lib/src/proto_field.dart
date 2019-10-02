@@ -30,7 +30,6 @@ class ProtoField {
     KtList<ProtoMessage> knownMessages,
     KtList<ProtoEnum> knownEnums,
   ) async {
-    // print('create: ${field.name}, ');
     return ProtoField._(
       await field.session.typeSystem,
       protoMessage,
@@ -79,7 +78,6 @@ class ProtoField {
   }
 
   String get singleType {
-    print('singleType: $name, $isEnum, $isList');
     if (isMessage) return protoMessage.name;
     if (isEnum) return protoEnum.name;
     return isList
