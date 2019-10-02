@@ -8,7 +8,18 @@ import 'utils.dart';
 class ProtoEnum {
   static const TYPE_PB_ENUM = 'ProtobufEnum';
 
-  const ProtoEnum(this.protoClass) : assert(protoClass != null);
+  static KtMutableMap<ClassElement, ProtoEnum> _enums = KtMutableMap.empty();
+
+  const ProtoEnum._(this.protoClass) : assert(protoClass != null);
+
+  factory ProtoEnum.forProtoClass(ClassElement protoClass) {
+    assert(protoClass != null);
+    if (!isTypeEnum(protoClass.type)) return null;
+
+    if (_enums[protoClass] != null) return _enums[protoClass];
+
+    return _enums[protoClass] = ProtoEnum._(protoClass);
+  }
 
   static KtList<ProtoEnum> enumsForClass(ClassElement protoMessageClass) {
     assert(protoMessageClass != null);
@@ -19,7 +30,7 @@ class ProtoEnum {
         .filterIsInstance<ClassElement>()
         .filter((e) => isTypeEnum(e.type))
         .filter((e) => e.name.startsWith(protoMessageClass.name))
-        .map((e) => ProtoEnum(e));
+        .map((e) => ProtoEnum.forProtoClass(e));
   }
 
   static bool isTypeEnum(InterfaceType type) =>

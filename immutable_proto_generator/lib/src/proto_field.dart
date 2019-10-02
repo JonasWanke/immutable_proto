@@ -26,32 +26,27 @@ class ProtoField {
   static Future<ProtoField> create(
     ClassElement protoMessage,
     FieldElement field,
-    KtList<ProtoMessage> knownMessages,
-    KtList<ProtoEnum> knownEnums,
   ) async {
+    final type = singleTypeOf(field.type);
     return ProtoField._(
       await field.session.typeSystem,
       protoMessage,
       field,
       protoFieldFor(protoMessage, field),
-      knownMessages
-          .firstOrNull((e) => singleTypeOf(field.type) == e.protoMessage.type),
-      knownEnums
-          .firstOrNull((e) => singleTypeOf(field.type) == e.protoClass.type),
+      await ProtoMessage.forProtoClass(type.element),
+      ProtoEnum.forProtoClass(type.element),
     );
   }
 
   static Future<KtList<ProtoField>> fieldsForMessage(
     ClassElement protoMessage,
-    KtList<ProtoMessage> knownMessages,
-    KtList<ProtoEnum> knownEnums,
   ) async {
     return Future.wait(protoMessage.fields
         .where((f) => !f.isStatic)
         .where((f) => f.name != 'info_')
         .where((f) => !protoMessage.supertype.element.fields.contains(f))
         .map(
-          (f) => ProtoField.create(protoMessage, f, knownMessages, knownEnums),
+          (f) => ProtoField.create(protoMessage, f),
         )).then((f) => KtList.from(f));
   }
 
