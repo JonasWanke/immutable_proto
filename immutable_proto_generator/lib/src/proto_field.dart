@@ -3,7 +3,6 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_system.dart';
 import 'package:immutable_proto/immutable_proto.dart';
 import 'package:immutable_proto_generator/src/utils.dart';
-import 'package:kt_dart/collection.dart';
 
 import 'proto_enum.dart';
 import 'proto_message.dart';

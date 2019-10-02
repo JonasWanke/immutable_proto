@@ -1,5 +1,5 @@
 name: immutable_proto
-description: Dart packages for generating immutable classes from Protocol Buffers
+description: Automatically generates an immutable class for a ProtoBuf
 version: 0.0.1
 homepage: https://github.com/JonasWanke/immutable_proto/tree/master/immutable_proto
 author: Jonas Wanke <contact@wanke.dev>
