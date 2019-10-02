@@ -10,6 +10,9 @@ import 'utils.dart';
 class ProtoMessage {
   static const TYPE_PB_MESSAGE = 'GeneratedMessage';
 
+  static KtMutableMap<ClassElement, ProtoMessage> _messages =
+      KtMutableMap.empty();
+
   const ProtoMessage._(
     this.protoMessage,
     this.subMessages,
@@ -20,20 +23,23 @@ class ProtoMessage {
         assert(enums != null),
         assert(fields != null);
 
-  static Future<ProtoMessage> create(
-    ClassElement protoMessageClass, {
+  static Future<ProtoMessage> forProtoClass(
+    ClassElement protoClass, {
     ClassElement annotatedClass,
     KtList<ProtoMessage> subMessages,
   }) async {
-    assert(protoMessageClass != null);
+    assert(protoClass != null);
+    if (!isTypeMessage(protoClass.type)) return null;
 
-    final enums = ProtoEnum.enumsForClass(protoMessageClass);
-    final subMessages = await _subMessages(protoMessageClass);
-    return ProtoMessage._(
-      protoMessageClass,
+    if (_messages[protoClass] != null) return _messages[protoClass];
+
+    final enums = ProtoEnum.enumsForClass(protoClass);
+    final subMessages = await _subMessages(protoClass);
+    return _messages[protoClass] = ProtoMessage._(
+      protoClass,
       subMessages,
       enums,
-      await ProtoField.fieldsForMessage(protoMessageClass, subMessages, enums),
+      await ProtoField.fieldsForMessage(protoClass),
       annotatedClass: annotatedClass,
     );
   }
@@ -49,7 +55,7 @@ class ProtoMessage {
           .filter((e) => e.name.startsWith(protoMessageClass.name))
           .filter((e) => e != protoMessageClass)
           .filter((e) => isTypeMessage(e.type))
-          .map((e) => ProtoMessage.create(e))
+          .map((e) => ProtoMessage.forProtoClass(e))
           .asList(),
     ).then((m) => KtList.from(m));
   }

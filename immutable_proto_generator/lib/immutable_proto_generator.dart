@@ -44,7 +44,7 @@ class ImmutableProtoGenerator extends Generator {
         annotation.read('type').typeValue.element as ClassElement;
     final annotatedElement = element as ClassElement;
 
-    final message = await ProtoMessage.create(
+    final message = await ProtoMessage.forProtoClass(
       protoMessage,
       annotatedClass: annotatedElement,
     );
