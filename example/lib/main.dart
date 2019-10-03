@@ -1,4 +1,6 @@
 import 'package:immutable_proto/immutable_proto.dart';
+import 'package:kt_dart/collection.dart';
+import 'package:meta/meta.dart';
 
 import 'proto_generated/user.pb.dart' as proto;
 

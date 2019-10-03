@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:immutable_proto/immutable_proto.dart';
+import 'package:kt_dart/collection.dart';
+import 'package:meta/meta.dart';
 import 'package:source_gen/source_gen.dart';
 
 import 'src/proto_message.dart';
