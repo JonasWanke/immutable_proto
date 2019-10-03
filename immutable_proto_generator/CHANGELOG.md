@@ -16,7 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 -->
 
-## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.2...dev)
+## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.3...dev)
+
+## [0.0.3](https://github.com/JonasWanke/immutable_proto/compare/v0.0.2...v0.0.3) - 2019-10-03
+### Fixed
+- update dependencies
 
 ## [0.0.2](https://github.com/JonasWanke/immutable_proto/compare/v0.0.1...v0.0.2) - 2019-10-02
 ### Added
