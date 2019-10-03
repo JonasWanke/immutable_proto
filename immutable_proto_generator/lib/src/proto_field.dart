@@ -99,10 +99,12 @@ class ProtoField {
     var res = '$protoName.$name';
     if (isList) {
       res = 'KtList.from($protoName.$name)';
-      if (isMessage)
+      if (isMessage) {
         res = '$res.map(($short) => ${protoMessage.name}.fromProto($short))';
-      if (isEnum)
+      }
+      if (isEnum) {
         res = '$res.map(($short) => ${protoEnum.fromProtoMethodName}($short))';
+      }
     } else if (isEnum) res = '${protoEnum.fromProtoMethodName}($res)';
     return '$name: $res';
   }
@@ -112,8 +114,9 @@ class ProtoField {
     var res = '$name';
     if (isList) {
       if (isMessage) res = '$res.map(($short) => $short.toProto())';
-      if (isEnum)
+      if (isEnum) {
         res = '$res.map(($short) => ${protoEnum.toProtoMethodName}($short))';
+      }
       res = '$protoName.$name.addAll($res.iter);';
     } else {
       if (isEnum) res = '${protoEnum.toProtoMethodName}($res)';

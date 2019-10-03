@@ -79,14 +79,16 @@ class ProtoMessage {
 
     var extendsImplements = '';
     if (annotatedClass != null) {
-      if (annotatedClass.supertype?.isObject == false)
+      if (annotatedClass.supertype?.isObject == false) {
         extendsImplements += ' extends ${annotatedClass.supertype.name} ';
-      if (annotatedClass.interfaces.isNotEmpty)
+      }
+      if (annotatedClass.interfaces.isNotEmpty) {
         extendsImplements +=
             KtList.from(annotatedClass.interfaces).joinToString(
           transform: (i) => i.name,
           prefix: ' implements ',
         );
+      }
     }
 
     final classFields = fields.joinToString(

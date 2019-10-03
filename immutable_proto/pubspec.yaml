@@ -9,3 +9,6 @@ environment:
 
 dependencies:
   meta: ^1.1.7
+  
+dev_dependencies:
+  pedantic: ^1.0.0

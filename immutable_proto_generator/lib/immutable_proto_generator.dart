@@ -33,14 +33,16 @@ class ImmutableProtoGenerator extends Generator {
 
   Future<String> generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) async {
-    if (element is! ClassElement)
+    if (element is! ClassElement) {
       throw 'Only classes can be annotated with `@ImmutableProto()`.';
-    if (!element.name.startsWith(MUTABLE_PREFIX))
+    }
+    if (!element.name.startsWith(MUTABLE_PREFIX)) {
       throw 'The names of classes annotated with `@ImmutableProto()` should '
           'start with `$MUTABLE_PREFIX`, for example `${MUTABLE_PREFIX}User`. '
           'The immutable class will then get automatically generated for you '
           'by running `pub run build_runner build` (or '
           '`flutter pub run build_runner build` if you\'re on Flutter).';
+    }
 
     final protoMessage =
         annotation.read('type').typeValue.element as ClassElement;
