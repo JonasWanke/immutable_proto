@@ -2,10 +2,6 @@ library immutable_proto;
 
 import 'package:meta/meta.dart';
 
-export 'package:meta/meta.dart' show immutable, required;
-export 'package:protobuf/protobuf.dart';
-export 'package:kt_dart/collection.dart';
-
 @immutable
 class ImmutableProto {
   const ImmutableProto(this.type);

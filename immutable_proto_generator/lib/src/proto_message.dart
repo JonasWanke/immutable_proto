@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:immutable_proto/immutable_proto.dart';
+import 'package:kt_dart/collection.dart';
+import 'package:meta/meta.dart';
 
 import 'proto_enum.dart';
 import 'proto_field.dart';
@@ -78,14 +79,16 @@ class ProtoMessage {
 
     var extendsImplements = '';
     if (annotatedClass != null) {
-      if (annotatedClass.supertype?.isObject == false)
+      if (annotatedClass.supertype?.isObject == false) {
         extendsImplements += ' extends ${annotatedClass.supertype.name} ';
-      if (annotatedClass.interfaces.isNotEmpty)
+      }
+      if (annotatedClass.interfaces.isNotEmpty) {
         extendsImplements +=
             KtList.from(annotatedClass.interfaces).joinToString(
           transform: (i) => i.name,
           prefix: ' implements ',
         );
+      }
     }
 
     final classFields = fields.joinToString(

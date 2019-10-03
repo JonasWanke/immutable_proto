@@ -1,8 +1,9 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_system.dart';
-import 'package:immutable_proto/immutable_proto.dart';
 import 'package:immutable_proto_generator/src/utils.dart';
+import 'package:kt_dart/collection.dart';
+import 'package:meta/meta.dart';
 
 import 'proto_enum.dart';
 import 'proto_message.dart';
@@ -98,10 +99,12 @@ class ProtoField {
     var res = '$protoName.$name';
     if (isList) {
       res = 'KtList.from($protoName.$name)';
-      if (isMessage)
+      if (isMessage) {
         res = '$res.map(($short) => ${protoMessage.name}.fromProto($short))';
-      if (isEnum)
+      }
+      if (isEnum) {
         res = '$res.map(($short) => ${protoEnum.fromProtoMethodName}($short))';
+      }
     } else if (isEnum) res = '${protoEnum.fromProtoMethodName}($res)';
     return '$name: $res';
   }
@@ -111,8 +114,9 @@ class ProtoField {
     var res = '$name';
     if (isList) {
       if (isMessage) res = '$res.map(($short) => $short.toProto())';
-      if (isEnum)
+      if (isEnum) {
         res = '$res.map(($short) => ${protoEnum.toProtoMethodName}($short))';
+      }
       res = '$protoName.$name.addAll($res.iter);';
     } else {
       if (isEnum) res = '${protoEnum.toProtoMethodName}($res)';
