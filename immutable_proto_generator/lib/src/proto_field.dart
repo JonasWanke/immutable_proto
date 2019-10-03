@@ -105,6 +105,8 @@ class ProtoField {
       if (isEnum) {
         res = '$res.map(($short) => ${protoEnum.fromProtoMethodName}($short))';
       }
+    } else if (isMessage) {
+      res = '${protoMessage.name}.fromProto($res)';
     } else if (isEnum) res = '${protoEnum.fromProtoMethodName}($res)';
     return '$name: $res';
   }
@@ -119,6 +121,7 @@ class ProtoField {
       }
       res = '$protoName.$name.addAll($res.iter);';
     } else {
+      if (isMessage) res = '$res.toProto()';
       if (isEnum) res = '${protoEnum.toProtoMethodName}($res)';
       res = '$protoName.$name = $res;';
     }
