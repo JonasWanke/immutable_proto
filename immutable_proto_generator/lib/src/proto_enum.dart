@@ -1,6 +1,7 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:immutable_proto/immutable_proto.dart';
+import 'package:kt_dart/collection.dart';
+import 'package:meta/meta.dart';
 
 import 'utils.dart';
 
