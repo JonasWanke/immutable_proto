@@ -3,11 +3,11 @@ This library generates immutable data classes for Protocol Buffers. Here's how t
 1. Add these packages to your dependencies:
 ```yaml
 dependencies:
-  immutable_proto: ^0.0.2
+  immutable_proto: ^0.0.4
 
 dev_dependencies:
   build_runner: ^1.0.0
-  immutable_proto_generator: ^0.0.2
+  immutable_proto_generator: ^0.0.4
 ```
 
 2. Write your Protocol Buffers definition.

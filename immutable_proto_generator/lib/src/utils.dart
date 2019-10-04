@@ -25,3 +25,19 @@ const KNOWN_LIST_TYPES = ['List', 'KtList', 'KtMutableList'];
 bool isTypeList(DartType type) {
   return KNOWN_LIST_TYPES.contains(type.name);
 }
+
+int countOccurences(String string, String substring) {
+  assert(string != null);
+  assert(substring != null);
+
+  int index = 0;
+  int count = 0;
+  while (index != -1) {
+    index = string.indexOf(substring, index);
+    if (index != -1) {
+      count++;
+      index += substring.length;
+    }
+  }
+  return count;
+}

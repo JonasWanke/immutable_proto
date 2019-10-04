@@ -1,6 +1,6 @@
 name: immutable_proto_generator
 description: Automatically generates an immutable class for a ProtoBuf
-version: 0.0.3
+version: 0.0.4
 homepage: https://github.com/JonasWanke/immutable_proto/tree/master/immutable_proto_generator
 author: Jonas Wanke <contact@wanke.dev>
 
@@ -11,7 +11,7 @@ dependencies:
   analyzer: '>=0.27.1 < 1.0.0'
   build: '>=0.12.0 <2.0.0'
   source_gen: ^0.9.0
-  immutable_proto: ^0.0.3
+  immutable_proto: ^0.0.4
 
   protobuf: ^1.0.0
   kt_dart: ^0.6.2
