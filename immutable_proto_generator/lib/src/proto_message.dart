@@ -46,16 +46,15 @@ class ProtoMessage {
   }
 
   static Future<KtList<ProtoMessage>> _subMessages(
-    ClassElement protoMessageClass,
+    ClassElement protoClass,
   ) async {
-    assert(protoMessageClass != null);
+    assert(protoClass != null);
 
     return Future.wait(
-      KtList.from(protoMessageClass.library.topLevelElements)
+      KtList.from(protoClass.library.topLevelElements)
           .filterIsInstance<ClassElement>()
-          .filter((e) => e.name.startsWith(protoMessageClass.name))
-          .filter((e) => e != protoMessageClass)
           .filter((e) => isTypeMessage(e.type))
+          .filter((e) => isDirectSubmessage(protoClass, e))
           .map((e) => ProtoMessage.forProtoClass(e))
           .asList(),
     ).then((m) => KtList.from(m));
@@ -63,6 +62,13 @@ class ProtoMessage {
 
   static bool isTypeMessage(InterfaceType type) =>
       type.superclass.name == TYPE_PB_MESSAGE;
+  static bool isDirectSubmessage(ClassElement outer, ClassElement inner) {
+    assert(outer != null);
+    assert(inner != null);
+
+    if (!inner.name.startsWith(outer.name)) return false;
+    return countOccurences(inner.name.substring(outer.name.length), '_') == 1;
+  }
 
   final ClassElement protoMessage;
   final KtList<ProtoEnum> enums;
