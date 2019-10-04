@@ -16,7 +16,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 -->
 
-## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.3...dev)
+## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.4...dev)
+
+## [0.0.4](https://github.com/JonasWanke/immutable_proto/compare/v0.0.3...v0.0.4) - 2019-10-04
+### Changed
+- **generator:** prefer null to empty values in `fromProto`
+
+### Fixed
+- **generator:** reduce false positives when detecting nested messages
+- **generator:** generate correct mappers for fields of type message
 
 ## [0.0.3](https://github.com/JonasWanke/immutable_proto/compare/v0.0.2...v0.0.3) - 2019-10-03
 ### Fixed
