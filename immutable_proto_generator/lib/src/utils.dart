@@ -47,6 +47,7 @@ bool isDirectlyNestedPbClass(ClassElement outer, ClassElement inner) {
   assert(outer != null);
   assert(inner != null);
 
-  if (!inner.name.startsWith(outer.name)) return false;
-  return countOccurences(inner.name.substring(outer.name.length), '_') == 1;
+  final prefix = '${outer.name}_';
+  if (!inner.name.startsWith(prefix)) return false;
+  return !inner.name.substring(prefix.length).contains('_');
 }

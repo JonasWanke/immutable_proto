@@ -16,7 +16,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 -->
 
-## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.4...dev)
+## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.5...dev)
+
+## 0.0.5+1 - 2019-10-06
+### Fixed
+- **generator:** reduce false positives when detecting nested messages/enums
+
+## [0.0.5](https://github.com/JonasWanke/immutable_proto/compare/v0.0.4...v0.0.5) - 2019-10-06
+### Changed
+- **generator:** make enum values required
+
+### Fixed
+- **generator:** reduce false positives when detecting nested enums
 
 ## [0.0.4](https://github.com/JonasWanke/immutable_proto/compare/v0.0.3...v0.0.4) - 2019-10-04
 ### Changed
