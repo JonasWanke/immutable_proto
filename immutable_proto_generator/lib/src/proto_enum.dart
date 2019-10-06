@@ -30,7 +30,7 @@ class ProtoEnum {
         .flatMap((l) => KtList.from(l.topLevelElements))
         .filterIsInstance<ClassElement>()
         .filter((e) => isTypeEnum(e.type))
-        .filter((e) => e.name.startsWith(protoMessageClass.name))
+        .filter((e) => isDirectlyNestedPbClass(protoMessageClass, e))
         .map((e) => ProtoEnum.forProtoClass(e));
   }
 

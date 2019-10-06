@@ -54,7 +54,7 @@ class ProtoMessage {
       KtList.from(protoClass.library.topLevelElements)
           .filterIsInstance<ClassElement>()
           .filter((e) => isTypeMessage(e.type))
-          .filter((e) => isDirectSubmessage(protoClass, e))
+          .filter((e) => isDirectlyNestedPbClass(protoClass, e))
           .map((e) => ProtoMessage.forProtoClass(e))
           .asList(),
     ).then((m) => KtList.from(m));
@@ -62,13 +62,6 @@ class ProtoMessage {
 
   static bool isTypeMessage(InterfaceType type) =>
       type.superclass.name == TYPE_PB_MESSAGE;
-  static bool isDirectSubmessage(ClassElement outer, ClassElement inner) {
-    assert(outer != null);
-    assert(inner != null);
-
-    if (!inner.name.startsWith(outer.name)) return false;
-    return countOccurences(inner.name.substring(outer.name.length), '_') == 1;
-  }
 
   final ClassElement protoMessage;
   final KtList<ProtoEnum> enums;
