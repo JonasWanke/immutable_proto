@@ -42,7 +42,8 @@ class ProtoField {
   static Future<KtList<ProtoField>> fieldsForMessage(
     ClassElement protoMessage,
   ) async {
-    return Future.wait(protoMessage.fields
+    return Future.wait((protoMessage.fields
+    ..forEach((f) => print('${protoMessage.name}: ${f.name}')))
         .where((f) => !f.isStatic)
         .where((f) => f.name != 'info_')
         .where((f) => !protoMessage.supertype.element.fields.contains(f))
@@ -85,7 +86,7 @@ class ProtoField {
   bool get isList => isTypeList(field.type);
   bool get isMessage => protoMessage != null;
   bool get isEnum => protoEnum != null;
-  bool get isRequired => field.hasRequired || isList;
+  bool get isRequired => field.hasRequired || isList || isEnum;
 
   String generateField() =>
       (isRequired ? '@required ' : '') + 'final $type $name;';
