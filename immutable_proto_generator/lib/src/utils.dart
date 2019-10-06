@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 String lowerFirstChar(String original) {
@@ -40,4 +41,13 @@ int countOccurences(String string, String substring) {
     }
   }
   return count;
+}
+
+bool isDirectlyNestedPbClass(ClassElement outer, ClassElement inner) {
+  assert(outer != null);
+  assert(inner != null);
+
+  final prefix = '${outer.name}_';
+  if (!inner.name.startsWith(prefix)) return false;
+  return !inner.name.substring(prefix.length).contains('_');
 }
