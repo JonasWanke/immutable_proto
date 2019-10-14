@@ -15,24 +15,17 @@ Builder generateImmutableProto(BuilderOptions options) =>
     SharedPartBuilder([ImmutableProtoGenerator()], 'immutable_proto');
 
 @immutable
-class ImmutableProtoGenerator extends Generator {
+class ImmutableProtoGenerator extends GeneratorForAnnotation<ImmutableProto> {
   static const String MUTABLE_PREFIX = 'Mutable';
 
+  const ImmutableProtoGenerator();
+
   @override
-  FutureOr<String> generate(LibraryReader library, BuildStep buildStep) async {
-    final values = KtMutableSet<String>.empty();
-
-    for (var annotatedElement
-        in library.annotatedWith(TypeChecker.fromRuntime(ImmutableProto))) {
-      values.add(await generateForAnnotatedElement(
-          annotatedElement.element, annotatedElement.annotation, buildStep));
-    }
-
-    return values.filterNotNull().joinToString(separator: '\n\n');
-  }
-
-  Future<String> generateForAnnotatedElement(
-      Element element, ConstantReader annotation, BuildStep buildStep) async {
+  generateForAnnotatedElement(
+    Element element,
+    ConstantReader annotation,
+    BuildStep buildStep,
+  ) async {
     if (element is! ClassElement) {
       throw 'Only classes can be annotated with `@ImmutableProto()`.';
     }

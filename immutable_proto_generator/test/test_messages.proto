@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package wanke.immutable_proto_generator.test;
+
+
+message ScalarsMessage {
+  double double = 1;
+  float float = 2;
+  int32 int32 = 3;
+  int64 int64 = 4;
+  uint32 uint32 = 5;
+  uint64 uint64 = 6;
+  sint32 sint32 = 7;
+  sint64 sint64 = 8;
+  fixed32 fixed32 = 9;
+  fixed64 fixed64 = 10;
+  sfixed32 sfixed32 = 11;
+  sfixed64 sfixed64 = 12;
+}
+message RepeatedScalarsMessage {
+  repeated double repeated_double = 1;
+  repeated float repeated_float = 2;
+  repeated int32 repeated_int32 = 3;
+  repeated int64 repeated_int64 = 4;
+  repeated uint32 repeated_uint32 = 5;
+  repeated uint64 repeated_uint64 = 6;
+  repeated sint32 repeated_sint32 = 7;
+  repeated sint64 repeated_sint64 = 8;
+  repeated fixed32 repeated_fixed32 = 9;
+  repeated fixed64 repeated_fixed64 = 10;
+  repeated sfixed32 repeated_sfixed32 = 11;
+  repeated sfixed64 repeated_sfixed64 = 12;
+}
+
+message EnumMessage {
+  enum SingleEnum {
+    UNKNOWN_SINGLE = 0;
+  }
+  SingleEnum single_enum = 1;
+  repeated SingleEnum repeated_single_enum = 2;
+
+  enum MultipleEnum {
+    UNKNOWN_MULTIPLE = 0;
+    FIRST = 1;
+    reserved 2;
+    THIRD = 3;
+    reserved 4 to 6;
+  }
+  MultipleEnum multiple_enum = 3;
+  repeated MultipleEnum repeated_multiple_enum = 4;
+}
