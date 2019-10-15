@@ -16,6 +16,9 @@ message ScalarsMessage {
   fixed64 fixed64 = 10;
   sfixed32 sfixed32 = 11;
   sfixed64 sfixed64 = 12;
+  bool bool = 13;
+  string string = 14;
+  bytes bytes = 15;
 }
 message RepeatedScalarsMessage {
   repeated double repeated_double = 1;
@@ -30,6 +33,9 @@ message RepeatedScalarsMessage {
   repeated fixed64 repeated_fixed64 = 10;
   repeated sfixed32 repeated_sfixed32 = 11;
   repeated sfixed64 repeated_sfixed64 = 12;
+  repeated bool repeated_bool = 13;
+  repeated string repeated_string = 14;
+  repeated bytes repeated_bytes = 15;
 }
 
 message EnumMessage {
