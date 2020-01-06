@@ -30,7 +30,7 @@ class ProtoField {
   ) async {
     final type = singleTypeOf(field.type);
     return ProtoField._(
-      await field.session.typeSystem,
+      await field.library.typeSystem,
       protoMessage,
       field,
       protoFieldFor(protoMessage, field),

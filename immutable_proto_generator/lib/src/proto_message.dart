@@ -11,7 +11,7 @@ import 'utils.dart';
 class ProtoMessage {
   static const TYPE_PB_MESSAGE = 'GeneratedMessage';
 
-  static KtMutableMap<ClassElement, ProtoMessage> _messages =
+  static final KtMutableMap<ClassElement, ProtoMessage> _messages =
       KtMutableMap.empty();
 
   const ProtoMessage._(
@@ -30,7 +30,7 @@ class ProtoMessage {
     KtList<ProtoMessage> subMessages,
   }) async {
     assert(protoClass != null);
-    if (!isTypeMessage(protoClass.type)) return null;
+    if (!isTypeMessage(protoClass.thisType)) return null;
 
     if (_messages[protoClass] != null) return _messages[protoClass];
 
@@ -53,7 +53,7 @@ class ProtoMessage {
     return Future.wait(
       KtList.from(protoClass.library.topLevelElements)
           .filterIsInstance<ClassElement>()
-          .filter((e) => isTypeMessage(e.type))
+          .filter((e) => isTypeMessage(e.thisType))
           .filter((e) => isDirectlyNestedPbClass(protoClass, e))
           .map((e) => ProtoMessage.forProtoClass(e))
           .asList(),
