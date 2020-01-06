@@ -42,8 +42,7 @@ class ProtoField {
   static Future<KtList<ProtoField>> fieldsForMessage(
     ClassElement protoMessage,
   ) async {
-    return Future.wait((protoMessage.fields
-    ..forEach((f) => print('${protoMessage.name}: ${f.name}')))
+    return Future.wait(protoMessage.fields
         .where((f) => !f.isStatic)
         .where((f) => f.name != 'info_')
         .where((f) => !protoMessage.supertype.element.fields.contains(f))
