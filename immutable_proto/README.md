@@ -29,7 +29,7 @@ message User {
 }
 ```
 
-3. Generate the default (mutable) dart code for your Protobuf message (see the [official documentation](https://developers.google.com/protocol-buffers/docs/darttutorial) for more information).
+3. Generate the default (mutable) dart code for your Protobuf message (see the [official documentation](https://developers.google.com/protocol-buffers/docs/darttutorial#compiling-your-protocol-buffers) for more information).
 
 4. Import the generated class with prefix `proto` to avoid name conflicts.
 ```dart
@@ -49,7 +49,7 @@ class MutableUser {
   @required // This field must not be null
   String lastName;
 
-  // Lists must not be null by default
+  // Lists are non-nullable by default
   KtList<String> emailAddresses;
 
   // Will be replaced by the generated enum
@@ -175,6 +175,7 @@ enum UserFavoriteDrink {
 - [x] Generate basic immutable classes for a message
 - [x] Generate classes for **nested messages** automatically
 - [x] Generate enum + mappers for **nested enums** automatically
+- [ ] Support built-in [wrappers](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/wrappers.proto) (e.g. UInt32Value)
 - [ ] `oneof`-support
 - [ ] Commented code
 - [ ] Custom methods
