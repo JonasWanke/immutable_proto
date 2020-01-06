@@ -12,19 +12,21 @@ class User {
   final String lastName;
   @required
   final KtList<String> emailAddresses;
+  @required
   final UserFavoriteDrink favoriteDrink;
 
   User({
     this.firstName,
     this.lastName,
     @required this.emailAddresses,
-    this.favoriteDrink,
-  }) : assert(emailAddresses != null);
+    @required this.favoriteDrink,
+  })  : assert(emailAddresses != null),
+        assert(favoriteDrink != null);
 
   User.fromProto(proto.User user)
       : this(
-          firstName: user.firstName,
-          lastName: user.lastName,
+          firstName: user.hasFirstName() ? user.firstName : null,
+          lastName: user.hasLastName() ? user.lastName : null,
           emailAddresses: KtList.from(user.emailAddresses),
           favoriteDrink: userFavoriteDrinkFromProto(user.favoriteDrink),
         );
@@ -32,9 +34,8 @@ class User {
     final user = proto.User();
     if (firstName != null) user.firstName = firstName;
     if (lastName != null) user.lastName = lastName;
-    user.emailAddresses.addAll(emailAddresses.iter);
-    if (favoriteDrink != null)
-      user.favoriteDrink = userFavoriteDrinkToProto(favoriteDrink);
+    user.emailAddresses = emailAddresses.asList();
+    user.favoriteDrink = userFavoriteDrinkToProto(favoriteDrink);
     return user;
   }
 
