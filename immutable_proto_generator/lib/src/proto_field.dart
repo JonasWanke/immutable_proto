@@ -2,7 +2,6 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/type_system.dart';
 import 'package:immutable_proto_generator/src/utils.dart';
-import 'package:kt_dart/collection.dart';
 import 'package:meta/meta.dart';
 
 import 'proto_enum.dart';
@@ -10,8 +9,6 @@ import 'proto_message.dart';
 
 @immutable
 class ProtoField {
-  static const TYPE_LIST = 'KtList';
-
   const ProtoField._(
     this.typeSystem,
     this.parentProtoMessage,
@@ -39,16 +36,16 @@ class ProtoField {
     );
   }
 
-  static Future<KtList<ProtoField>> fieldsForMessage(
+  static Future<List<ProtoField>> fieldsForMessage(
     ClassElement protoMessage,
   ) async {
-    return Future.wait(protoMessage.fields
-        .where((f) => !f.isStatic)
-        .where((f) => f.name != 'info_')
-        .where((f) => !protoMessage.supertype.element.fields.contains(f))
-        .map(
-          (f) => ProtoField.create(protoMessage, f),
-        )).then((f) => KtList.from(f));
+    return Future.wait(
+      protoMessage.fields
+          .where((f) => !f.isStatic)
+          .where((f) => f.name != 'info_')
+          .where((f) => !protoMessage.supertype.element.fields.contains(f))
+          .map((f) => ProtoField.create(protoMessage, f)),
+    );
   }
 
   static FieldElement protoFieldFor(
@@ -65,7 +62,7 @@ class ProtoField {
   final ProtoEnum protoEnum;
 
   final FieldElement field;
-  String get type => isList ? '$TYPE_LIST<$singleType>' : singleType;
+  String get type => isList ? 'List<$singleType>' : singleType;
 
   static InterfaceType singleTypeOf(DartType type) {
     return (isTypeList(type) ? (type as InterfaceType).typeArguments[0] : type)
@@ -98,7 +95,7 @@ class ProtoField {
     final short = name[0];
     var res = '$protoName.$name';
     if (isList) {
-      res = 'KtList.from($protoName.$name)';
+      res = '$protoName.$name';
       if (isMessage) {
         res = '$res.map(($short) => ${protoMessage.name}.fromProto($short))';
       }
@@ -123,7 +120,7 @@ class ProtoField {
       if (isEnum) {
         res = '$res.map(($short) => ${protoEnum.toProtoMethodName}($short))';
       }
-      res = '$protoName.$name.addAll($res.iter);';
+      res = '$protoName.$name.addAll($res);';
     } else {
       if (isMessage) res = '$res.toProto()';
       if (isEnum) res = '${protoEnum.toProtoMethodName}($res)';

@@ -11,7 +11,7 @@ class User {
   final String firstName;
   final String lastName;
   @required
-  final KtList<String> emailAddresses;
+  final List<String> emailAddresses;
   @required
   final UserFavoriteDrink favoriteDrink;
 
@@ -27,14 +27,14 @@ class User {
       : this(
           firstName: user.hasFirstName() ? user.firstName : null,
           lastName: user.hasLastName() ? user.lastName : null,
-          emailAddresses: KtList.from(user.emailAddresses),
+          emailAddresses: user.emailAddresses,
           favoriteDrink: userFavoriteDrinkFromProto(user.favoriteDrink),
         );
   proto.User toProto() {
     final user = proto.User();
     if (firstName != null) user.firstName = firstName;
     if (lastName != null) user.lastName = lastName;
-    user.emailAddresses = emailAddresses.asList();
+    user.emailAddresses.addAll(emailAddresses);
     user.favoriteDrink = userFavoriteDrinkToProto(favoriteDrink);
     return user;
   }
@@ -56,7 +56,7 @@ class User {
   User copy({
     String firstName,
     String lastName,
-    KtList<String> emailAddresses,
+    List<String> emailAddresses,
     UserFavoriteDrink favoriteDrink,
   }) =>
       User(

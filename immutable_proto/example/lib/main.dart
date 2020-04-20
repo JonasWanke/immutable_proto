@@ -1,5 +1,4 @@
 import 'package:immutable_proto/immutable_proto.dart';
-import 'package:kt_dart/collection.dart';
 import 'package:meta/meta.dart';
 
 import 'proto_generated/user.pb.dart' as proto;
@@ -10,14 +9,14 @@ main() {
   final jane = User(
     firstName: 'Jane',
     lastName: 'Doe',
-    emailAddresses: KtList.of('jane.doe@example.com'),
+    emailAddresses: ['jane.doe@example.com'],
     favoriteDrink: UserFavoriteDrink.coffee,
   );
   print(jane);
 
   final john = jane.copy(
     firstName: 'John',
-    emailAddresses: KtList.of('john.doe@example.com'),
+    emailAddresses: ['john.doe@example.com'],
     favoriteDrink: UserFavoriteDrink.tea,
   );
   print(john);
@@ -30,7 +29,7 @@ class MutableUser {
   @required
   String lastName;
 
-  KtList<String> emailAddresses;
+  List<String> emailAddresses;
 
   proto.User_FavoriteDrink favoriteDrink;
 }

@@ -1,6 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:kt_dart/collection.dart';
+import 'package:dartx/dartx.dart';
 import 'package:meta/meta.dart';
 
 import 'proto_enum.dart';
@@ -11,8 +11,7 @@ import 'utils.dart';
 class ProtoMessage {
   static const TYPE_PB_MESSAGE = 'GeneratedMessage';
 
-  static final KtMutableMap<ClassElement, ProtoMessage> _messages =
-      KtMutableMap.empty();
+  static final Map<ClassElement, ProtoMessage> _messages = {};
 
   const ProtoMessage._(
     this.protoMessage,
@@ -27,7 +26,7 @@ class ProtoMessage {
   static Future<ProtoMessage> forProtoClass(
     ClassElement protoClass, {
     ClassElement annotatedClass,
-    KtList<ProtoMessage> subMessages,
+    List<ProtoMessage> subMessages,
   }) async {
     assert(protoClass != null);
     if (!isTypeMessage(protoClass.thisType)) return null;
@@ -45,30 +44,29 @@ class ProtoMessage {
     );
   }
 
-  static Future<KtList<ProtoMessage>> _subMessages(
+  static Future<List<ProtoMessage>> _subMessages(
     ClassElement protoClass,
   ) async {
     assert(protoClass != null);
 
     return Future.wait(
-      KtList.from(protoClass.library.topLevelElements)
-          .filterIsInstance<ClassElement>()
-          .filter((e) => isTypeMessage(e.thisType))
-          .filter((e) => isDirectlyNestedPbClass(protoClass, e))
-          .map((e) => ProtoMessage.forProtoClass(e))
-          .asList(),
-    ).then((m) => KtList.from(m));
+      protoClass.library.topLevelElements
+          .whereType<ClassElement>()
+          .where((e) => isTypeMessage(e.thisType))
+          .where((e) => isDirectlyNestedPbClass(protoClass, e))
+          .map((e) => ProtoMessage.forProtoClass(e)),
+    );
   }
 
   static bool isTypeMessage(InterfaceType type) =>
       type.superclass.name == TYPE_PB_MESSAGE;
 
   final ClassElement protoMessage;
-  final KtList<ProtoEnum> enums;
-  final KtList<ProtoField> fields;
+  final List<ProtoEnum> enums;
+  final List<ProtoField> fields;
 
   final ClassElement annotatedClass;
-  final KtList<ProtoMessage> subMessages;
+  final List<ProtoMessage> subMessages;
 
   String get name => snakeCamelToUpperCamel(protoMessage.name);
   String get protoName => protoMessage.name;
@@ -82,11 +80,9 @@ class ProtoMessage {
         extendsImplements += ' extends ${annotatedClass.supertype.name} ';
       }
       if (annotatedClass.interfaces.isNotEmpty) {
+        extendsImplements += ' implements ';
         extendsImplements +=
-            KtList.from(annotatedClass.interfaces).joinToString(
-          transform: (i) => i.name,
-          prefix: ' implements ',
-        );
+            annotatedClass.interfaces.joinToString(transform: (i) => i.name);
       }
     }
 
@@ -106,6 +102,7 @@ class ProtoMessage {
 
     final fromProtoFields = fields.joinToString(
       transform: (f) => f.generateFromProtoArg(lowerName),
+      separator: '',
       postfix: ',',
     );
     final toProtoFields = fields.joinToString(
@@ -115,11 +112,12 @@ class ProtoMessage {
 
     final equalsExpression = fields.joinToString(
       transform: (f) => f.generateEquals('other'),
-      prefix: '&& ',
-      separator: ' && ',
+      prefix: ' && ',
+      separator: '',
     );
     final hashList = fields.joinToString(
       transform: (f) => f.name,
+      separator: '',
       postfix: ',',
     );
     final copyArgs = fields.joinToString(
@@ -130,11 +128,8 @@ class ProtoMessage {
       transform: (f) => f.generateCopyParam(),
       separator: '\n',
     );
-    final toString = fields.joinToString(
-      prefix: '\'$name(',
-      transform: (f) => '${f.name}: \$${f.name}',
-      postfix: ')\'',
-    );
+    final toString =
+        '\'$name(${fields.joinToString(transform: (f) => '${f.name}: \$${f.name}')})\'';
 
     final enumDefinitions = enums.joinToString(
       transform: (e) => e.generateEnum(),
