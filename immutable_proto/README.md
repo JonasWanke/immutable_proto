@@ -10,7 +10,7 @@ dev_dependencies:
   immutable_proto_generator: ^0.0.5+1
 ```
 
-2. Write your Protocol Buffers definition.
+2. Write your Protocol Buffers definition:
 ```protobuf
 message User {
   string first_name = 1;
@@ -31,14 +31,11 @@ message User {
 
 3. Generate the default (mutable) dart code for your Protobuf message (see the [official documentation](https://developers.google.com/protocol-buffers/docs/darttutorial#compiling-your-protocol-buffers) for more information).
 
-4. Import the generated class with prefix `proto` to avoid name conflicts.
-```dart
-import 'proto_generated/user.pb.dart' as proto;
-```
-
-5. Write a blueprint class. Let the name be `Mutable<Protobuf name>` and annotate it with `@ImmutableProto(<Protobuf class>)` (`Protobuf class` is a reference to the generated (mutable) class):
+4. Write a blueprint class. Let the name be `Mutable<Protobuf name>` and annotate it with `@ImmutableProto(<Protobuf class>)` (`Protobuf class` is a reference to the generated (mutable) class):
 ```dart
 import 'package:immutable_proto/immutable_proto.dart';
+// Use an import prefix to avoid name conflicts:
+import 'proto_generated/user.pb.dart' as proto;
 
 part 'main.g.dart';
 
@@ -57,7 +54,7 @@ class MutableUser {
 }
 ```
 
-6. Run `pub run build_runner build` in the command line (or `flutter pub run build_runner build`, if you're using Flutter). The implementation based on your blueprint class will automatically get generated.
+5. Run `pub run build_runner build` in the command line (or `flutter pub run build_runner build`, if you're using Flutter). The implementation based on your blueprint class will automatically get generated.
 
 The immutable class contains
 - a constructor with named parameters and assertions for required values
@@ -179,20 +176,3 @@ enum UserFavoriteDrink {
 - [ ] `oneof`-support
 - [ ] Commented code
 - [ ] Custom methods
-
-
-## License
-
-Copyright 2019 Jonas Wanke
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
