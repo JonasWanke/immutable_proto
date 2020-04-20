@@ -31,8 +31,8 @@ int countOccurences(String string, String substring) {
   assert(string != null);
   assert(substring != null);
 
-  int index = 0;
-  int count = 0;
+  var index = 0;
+  var count = 0;
   while (index != -1) {
     index = string.indexOf(substring, index);
     if (index != -1) {

@@ -9,13 +9,13 @@ import 'utils.dart';
 class ProtoEnum {
   static const TYPE_PB_ENUM = 'ProtobufEnum';
 
-  static KtMutableMap<ClassElement, ProtoEnum> _enums = KtMutableMap.empty();
+  static final KtMutableMap<ClassElement, ProtoEnum> _enums = KtMutableMap.empty();
 
   const ProtoEnum._(this.protoClass) : assert(protoClass != null);
 
   factory ProtoEnum.forProtoClass(ClassElement protoClass) {
     assert(protoClass != null);
-    if (!isTypeEnum(protoClass.type)) return null;
+    if (!isTypeEnum(protoClass.thisType)) return null;
 
     if (_enums[protoClass] != null) return _enums[protoClass];
 
@@ -29,7 +29,7 @@ class ProtoEnum {
         .plusElement(protoMessageClass.library)
         .flatMap((l) => KtList.from(l.topLevelElements))
         .filterIsInstance<ClassElement>()
-        .filter((e) => isTypeEnum(e.type))
+        .filter((e) => isTypeEnum(e.thisType))
         .filter((e) => isDirectlyNestedPbClass(protoMessageClass, e))
         .map((e) => ProtoEnum.forProtoClass(e));
   }
@@ -46,7 +46,7 @@ class ProtoEnum {
   String get toProtoMethodName => '${lowerFirstChar(name)}ToProto';
 
   KtList<String> protoValues() => KtList.from(protoClass.fields)
-      .filter((f) => f.type == protoClass.type)
+      .filter((f) => f.type == protoClass.thisType)
       .map((f) => f.name);
 
   String generateEnum() {

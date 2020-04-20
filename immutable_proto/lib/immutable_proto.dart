@@ -16,7 +16,7 @@ class ImmutableProto {
 int hashList(Iterable<Object> arguments) {
   var result = 0;
   if (arguments != null) {
-    for (Object argument in arguments) {
+    for (var argument in arguments) {
       var hash = result;
       hash = 0x1fffffff & (hash + argument.hashCode);
       hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
