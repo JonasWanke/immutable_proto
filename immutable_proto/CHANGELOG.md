@@ -16,7 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Security
 -->
 
-## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.0.5...dev)
+## [Unreleased](https://github.com/JonasWanke/immutable_proto/compare/v0.1.0...dev)
+
+## [0.1.0](https://github.com/JonasWanke/immutable_proto/compare/v0.0.5...v0.1.0) - 2020-04-20
+### ⚠ BREAKING CHANGES
+- **generator:** use Dart's `List` instead of `KtList`
 
 ## 0.0.5+1 - 2019-10-06
 ### Fixed
