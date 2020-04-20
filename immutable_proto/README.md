@@ -50,7 +50,7 @@ class MutableUser {
   String lastName;
 
   // Lists are non-nullable by default
-  KtList<String> emailAddresses;
+  List<String> emailAddresses;
 
   // Will be replaced by the generated enum
   proto.User_FavoriteDrink favoriteDrink;
@@ -73,7 +73,7 @@ class User {
   final String firstName;
   final String lastName;
   @required
-  final KtList<String> emailAddresses;
+  final List<String> emailAddresses;
   final UserFavoriteDrink favoriteDrink;
 
   User({
@@ -87,14 +87,14 @@ class User {
       : this(
           firstName: user.firstName,
           lastName: user.lastName,
-          emailAddresses: KtList.from(user.emailAddresses),
+          emailAddresses: user.emailAddresses,
           favoriteDrink: userFavoriteDrinkFromProto(user.favoriteDrink),
         );
   proto.User toProto() {
     final user = proto.User();
     if (firstName != null) user.firstName = firstName;
     if (lastName != null) user.lastName = lastName;
-    user.emailAddresses.addAll(emailAddresses.iter);
+    user.emailAddresses.addAll(emailAddresses);
     if (favoriteDrink != null)
       user.favoriteDrink = userFavoriteDrinkToProto(favoriteDrink);
     return user;
@@ -117,7 +117,7 @@ class User {
   User copy({
     String firstName,
     String lastName,
-    KtList<String> emailAddresses,
+    List<String> emailAddresses,
     UserFavoriteDrink favoriteDrink,
   }) =>
       User(
